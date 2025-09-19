@@ -11,6 +11,8 @@ on:
 jobs:
   sync-tooling:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout consumer repo
@@ -31,8 +33,8 @@ jobs:
 
       - name: Commit & Push if changes
         run: |
-          git config user.name "CI Bot"
-          git config user.email "ci-bot@example.com"
+          git config user.name "loymisquith ACG Bot"
+          git config user.email "loymisquith@acg-bot.com"
           [ -d .claude ] && git add .claude
           [ -d ai ] && git add ai
           if ! git diff --cached --quiet; then
