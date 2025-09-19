@@ -28,12 +28,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: loy-misquith-frequence/acg-development-tooling
-          path: /tmp/tooling
+          path: tooling
 
       - name: Sync .claude and ai
         run: |
-          rsync -av --delete /tmp/tooling/.claude/ .claude/ || true
-          rsync -av --delete /tmp/tooling/ai/ ai/ || true
+          rsync -av --delete tooling/.claude/ .claude/ || true
+          rsync -av --delete tooling/ai/ ai/ || true
 
       - name: Commit & Push if changes
         run: |
