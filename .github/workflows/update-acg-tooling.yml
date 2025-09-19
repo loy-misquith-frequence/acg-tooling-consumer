@@ -1,0 +1,43 @@
+name: Sync Claude & AI Tooling
+
+on:
+  workflow_dispatch:
+    inputs:
+      target-branch:
+        description: "Branch to sync tooling into"
+        required: true
+        default: "ACG-180_acg_tooling_common_config_testing_loy"
+
+jobs:
+  sync-tooling:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout consumer repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target-branch }}
+
+      - name: Checkout central repo
+        uses: actions/checkout@v4
+        with:
+          repository: loy-misquith-frequence/acg-development-tooling
+          path: /tmp/tooling
+
+      - name: Sync .claude and ai
+        run: |
+          rsync -av --delete /tmp/tooling/.claude/ .claude/ || true
+          rsync -av --delete /tmp/tooling/ai/ ai/ || true
+
+      - name: Commit & Push if changes
+        run: |
+          git config user.name "CI Bot"
+          git config user.email "ci-bot@example.com"
+          [ -d .claude ] && git add .claude
+          [ -d ai ] && git add ai
+          if ! git diff --cached --quiet; then
+            git commit -m "Sync .claude and ai from acg-development-tooling"
+            git push origin HEAD:${{ github.event.inputs.target-branch }}
+          else
+            echo "No changes to commit."
+          fi
