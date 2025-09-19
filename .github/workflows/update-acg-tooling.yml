@@ -28,7 +28,7 @@ jobs:
       - name: Sync ai directory
         run: |
           rsync -av --delete source-repo/ai/ ai/ || true
-          rsync -av --delete --exclude='frequence_api_context/' --exclude='frequence_platform_context/' source-repo/ai/ ai/ || true
+          rsync -av --delete --exclude='ai/frequence_api_context/' --exclude='ai/frequence_platform_context/' source-repo/ai/ ai/ || true
 
       - name: Commit & Push if changes
         run: |
