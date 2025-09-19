@@ -7,6 +7,10 @@ on:
         description: "Branch to sync tooling into"
         required: true
         default: "master"
+      ai-folders:
+        description: "AI subfolders to sync (comma-separated, empty = all)"
+        required: false
+        default: ""
 
 jobs:
   sync-tooling:
@@ -33,7 +37,27 @@ jobs:
       - name: Sync .claude and ai
         run: |
           rsync -av --delete tooling/.claude/ .claude/ || true
-          rsync -av --delete tooling/ai/ ai/ || true
+
+          # Sync AI folders
+          if [ -z "${{ github.event.inputs.ai-folders }}" ]; then
+            # Sync all AI folders
+            rsync -av --delete tooling/ai/ ai/ || true
+          else
+            # Create ai directory if it doesn't exist
+            mkdir -p ai/
+
+            # Sync specific folders
+            IFS=',' read -ra FOLDERS <<< "${{ github.event.inputs.ai-folders }}"
+            for folder in "${FOLDERS[@]}"; do
+              folder=$(echo "$folder" | xargs)  # trim whitespace
+              if [ -d "tooling/ai/$folder" ]; then
+                echo "Syncing ai/$folder"
+                rsync -av --delete "tooling/ai/$folder/" "ai/$folder/" || true
+              else
+                echo "Warning: ai/$folder not found in source"
+              fi
+            done
+          fi
 
       - name: Commit & Push if changes
         run: |
