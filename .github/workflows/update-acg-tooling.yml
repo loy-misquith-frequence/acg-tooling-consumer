@@ -6,7 +6,7 @@ on:
       target-branch:
         description: "Branch to sync tooling into"
         required: true
-        default: "ACG-180_acg_tooling_common_config_testing_loy"
+        default: "master"
 
 jobs:
   sync-tooling:
@@ -18,7 +18,11 @@ jobs:
       - name: Checkout consumer repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.target-branch }}
+          ref: master
+
+      - name: Create target branch if needed
+        run: |
+          git checkout -B ${{ github.event.inputs.target-branch }}
 
       - name: Checkout central repo
         uses: actions/checkout@v4
